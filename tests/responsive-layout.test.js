@@ -78,10 +78,29 @@ test('voluntary and situational cards match the Fard-card grid with all informat
 });
 
 
-test('simultaneous live prayer-event cards wrap from a stable card basis', () => {
-  const layoutFix = css.slice(css.lastIndexOf('/* v2.5.3 layout correction'));
-  assert.match(layoutFix, /body \.live-events > \.live-event\s*\{[^}]*flex:\s*1 1 34rem/s);
-  assert.match(layoutFix, /width:\s*auto/);
-  assert.match(layoutFix, /min-width:\s*0/);
-  assert.match(layoutFix, /max-width:\s*100%/);
+test('simultaneous live prayer-event cards use a consistent grid and a clear four-zone composition', () => {
+  const layout = css.slice(css.lastIndexOf('/* v2.5.3 event-card composition'));
+  assert.match(layout, /body \.live-events\s*\{[^}]*display:\s*grid/s);
+  assert.match(layout, /grid-template-columns:\s*repeat\(auto-fit, minmax\(min\(100%, 31rem\), 1fr\)\)/);
+  assert.match(layout, /body \.live-events > \.live-event\s*\{[^}]*grid-template-rows:\s*auto auto 1fr auto/s);
+  assert.match(layout, /\.live-event-head\s*\{/);
+  assert.match(layout, /\.live-event-evidence\s*\{/);
+  assert.match(layout, /\.live-event-tracking\s*\{/);
+  assert.match(layout, /\.live-event-footer\s*\{/);
+  assert.match(layout, /\.mark-event-complete\s*\{[^}]*height:\s*2\.55rem/s);
+});
+
+test('live prayer-event markup separates identity, evidence, rakah tracking and completion action', () => {
+  const app = readText('../src/app.js', import.meta.url);
+  const render = app.slice(app.indexOf('function renderLiveEvents()'), app.indexOf('function renderFard('));
+  for (const zone of ['live-event-head', 'live-event-evidence', 'live-event-tracking', 'live-event-footer']) {
+    assert.ok(render.includes(zone), `missing ${zone}`);
+  }
+  assert.ok(render.indexOf('live-event-head') < render.indexOf('live-event-evidence'));
+  assert.ok(render.indexOf('live-event-evidence') < render.indexOf('live-event-tracking'));
+  assert.ok(render.indexOf('live-event-tracking') < render.indexOf('live-event-footer'));
+  assert.match(render, /data-event-countdown="true"/);
+  assert.match(render, /data-mark-complete=/);
+  assert.match(render, /voluntaryTicksHtml\(event\)/);
+  assert.match(render, /partsHtml\(event\.key, event\.date, true/);
 });
