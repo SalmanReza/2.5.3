@@ -1103,18 +1103,21 @@ function renderLiveEvents() {
     const isVol = event.kind === 'voluntary';
     const bnLive = lang() === 'bn';
     item.innerHTML = `
-      <div class="live-event-main">
-        <div class="live-event-type">${kindLabel}</div>
-        <button class="live-name" type="button" data-live-description="${event.kind}:${event.key}">${escapeHtml(displayName)}</button>
-        ${leadEvidenceHtml(event.key, event.date)}
-        <small class="live-time">${escapeHtml(fmt(event.start))} – ${escapeHtml(fmt(event.end))}</small>
-      ${isVol ? voluntaryTicksHtml(event) : partsHtml(event.key, event.date, true, { includeFard: true })}</div>
-      <div class="live-event-actions">
-        <button class="event-countdown countdown-card" type="button" data-event-countdown="true" data-kind="${event.kind}" data-key="${event.key}" data-date="${dateKey(event.date)}" data-start="${event.start.getTime()}" data-end="${event.end.getTime()}"><span class="countdown-card-label">TIME LEFT</span><strong class="countdown-card-value" data-live-countdown="true" data-until="${event.end.getTime()}">${countdown(event.end.getTime() - Date.now())}</strong></button>
-        <div class="live-tick-stack">
-          <button class="square-button is-complete mark-event-complete" type="button" data-mark-complete="${event.kind}" data-mark-key="${event.key}" data-mark-date="${dateKey(event.date)}" title="Mark Complete" aria-label="Mark Complete">Mark Complete</button>
+      <header class="live-event-head">
+        <div class="live-event-identity">
+          <div class="live-event-type">${kindLabel}</div>
+          <button class="live-name" type="button" data-live-description="${event.kind}:${event.key}">${escapeHtml(displayName)}</button>
+          <small class="live-time">${escapeHtml(fmt(event.start))} – ${escapeHtml(fmt(event.end))}</small>
         </div>
-      </div>`;
+        <button class="event-countdown countdown-card" type="button" data-event-countdown="true" data-kind="${event.kind}" data-key="${event.key}" data-date="${dateKey(event.date)}" data-start="${event.start.getTime()}" data-end="${event.end.getTime()}"><span class="countdown-card-label">TIME LEFT</span><strong class="countdown-card-value" data-live-countdown="true" data-until="${event.end.getTime()}">${countdown(event.end.getTime() - Date.now())}</strong></button>
+      </header>
+      <div class="live-event-evidence">${leadEvidenceHtml(event.key, event.date)}</div>
+      <section class="live-event-tracking" aria-label="${isVol ? (bnLive ? 'রাকাতের অগ্রগতি' : 'Rak‘ah progress') : (bnLive ? 'নামাজের অগ্রগতি' : 'Prayer progress')}">
+        ${isVol ? voluntaryTicksHtml(event) : partsHtml(event.key, event.date, true, { includeFard: true })}
+      </section>
+      <footer class="live-event-footer">
+        <button class="square-button is-complete mark-event-complete" type="button" data-mark-complete="${event.kind}" data-mark-key="${event.key}" data-mark-date="${dateKey(event.date)}" title="Mark Complete" aria-label="Mark Complete">Mark Complete</button>
+      </footer>`;
     box.append(item);
   }
   if (intervalRows) box.insertAdjacentHTML('afterbegin', intervalRows);
